@@ -2,25 +2,45 @@ let currentKanji;
 let quizQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
+let offlineKanji = [];
 
 function loadQuizQuestions() {
-    fetch('/get_next_kanji')
-        .then(response => response.json())
-        .then(data => {
-            quizQuestions = [data];
-            return fetch('/get_next_kanji');
-        })
-        .then(response => response.json())
-        .then(data => {
-            quizQuestions.push(data);
-            return fetch('/get_next_kanji');
-        })
-        .then(response => response.json())
-        .then(data => {
-            quizQuestions.push(data);
-            shuffleArray(quizQuestions);
-            displayQuestion();
-        });
+    if (navigator.onLine) {
+        fetch('/get_next_kanji')
+            .then(response => response.json())
+            .then(data => {
+                quizQuestions = [data];
+                return fetch('/get_next_kanji');
+            })
+            .then(response => response.json())
+            .then(data => {
+                quizQuestions.push(data);
+                return fetch('/get_next_kanji');
+            })
+            .then(response => response.json())
+            .then(data => {
+                quizQuestions.push(data);
+                shuffleArray(quizQuestions);
+                // Store quiz questions for offline use
+                localStorage.setItem('offlineQuizQuestions', JSON.stringify(quizQuestions));
+                displayQuestion();
+            })
+            .catch(() => {
+                loadOfflineQuizQuestions();
+            });
+    } else {
+        loadOfflineQuizQuestions();
+    }
+}
+
+function loadOfflineQuizQuestions() {
+    quizQuestions = JSON.parse(localStorage.getItem('offlineQuizQuestions')) || [];
+    if (quizQuestions.length > 0) {
+        shuffleArray(quizQuestions);
+        displayQuestion();
+    } else {
+        document.getElementById('quiz-container').innerHTML = '<p>No offline quiz questions available. Please connect to the internet to download new questions.</p>';
+    }
 }
 
 function shuffleArray(array) {
@@ -86,6 +106,11 @@ function showQuizResult() {
     document.getElementById('quiz-container').style.display = 'none';
     document.getElementById('quiz-result').style.display = 'block';
     document.getElementById('quiz-score').textContent = `${score} / ${quizQuestions.length}`;
+    
+    // Store quiz result for offline syncing
+    const offlineResults = JSON.parse(localStorage.getItem('offlineQuizResults')) || [];
+    offlineResults.push({ score: score, total: quizQuestions.length, timestamp: new Date().toISOString() });
+    localStorage.setItem('offlineQuizResults', JSON.stringify(offlineResults));
 }
 
 function restartQuiz() {
@@ -100,4 +125,19 @@ document.addEventListener('DOMContentLoaded', function() {
     loadQuizQuestions();
     document.getElementById('next-question').addEventListener('click', nextQuestion);
     document.getElementById('restart-quiz').addEventListener('click', restartQuiz);
+    
+    // Sync offline quiz results when coming back online
+    window.addEventListener('online', function() {
+        const offlineResults = JSON.parse(localStorage.getItem('offlineQuizResults')) || [];
+        offlineResults.forEach(result => {
+            fetch('/update_quiz_result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(result),
+            });
+        });
+        localStorage.removeItem('offlineQuizResults');
+    });
 });

@@ -1,0 +1,21 @@
+{
+  "name": "Kanji Learning App",
+  "short_name": "KanjiApp",
+  "description": "Learn Japanese kanji with flashcards, quizzes, and practice",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#343a40",
+  "theme_color": "#343a40",
+  "icons": [
+    {
+      "src": "/static/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

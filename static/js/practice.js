@@ -1,14 +1,41 @@
 let currentKanji;
-let canvas, ctx;
+let offlineKanji = [];
 
 function loadNextKanji() {
-    fetch('/get_next_kanji')
-        .then(response => response.json())
-        .then(data => {
-            currentKanji = data;
-            document.getElementById('practice-kanji').textContent = data.character;
-            document.getElementById('practice-meaning').textContent = data.meaning;
-        });
+    if (navigator.onLine) {
+        fetch('/get_next_kanji')
+            .then(response => response.json())
+            .then(data => {
+                currentKanji = data;
+                displayKanji(currentKanji);
+                // Store kanji for offline use
+                if (!offlineKanji.some(k => k.id === currentKanji.id)) {
+                    offlineKanji.push(currentKanji);
+                    localStorage.setItem('offlinePracticeKanji', JSON.stringify(offlineKanji));
+                }
+            })
+            .catch(() => {
+                loadOfflineKanji();
+            });
+    } else {
+        loadOfflineKanji();
+    }
+}
+
+function loadOfflineKanji() {
+    offlineKanji = JSON.parse(localStorage.getItem('offlinePracticeKanji')) || [];
+    if (offlineKanji.length > 0) {
+        currentKanji = offlineKanji[Math.floor(Math.random() * offlineKanji.length)];
+        displayKanji(currentKanji);
+    } else {
+        document.getElementById('practice-kanji').textContent = 'No offline data available';
+        document.getElementById('practice-meaning').textContent = 'Please connect to the internet to download new kanji.';
+    }
+}
+
+function displayKanji(kanji) {
+    document.getElementById('practice-kanji').textContent = kanji.character;
+    document.getElementById('practice-meaning').textContent = kanji.meaning;
 }
 
 function setupCanvas() {
@@ -72,5 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('next-kanji').addEventListener('click', function() {
         clearCanvas();
         loadNextKanji();
+    });
+
+    // Sync offline practice data when coming back online
+    window.addEventListener('online', function() {
+        // In this case, we don't need to sync any data to the server
+        // as practice data is not stored on the server
+        console.log('Back online. Practice data is available locally.');
     });
 });
