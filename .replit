@@ -15,6 +15,10 @@ author = "agent"
 task = "workflow.run"
 args = "Start Flask Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Seed Kanji Data"
+
 [[workflows.workflow]]
 name = "Start Flask Server"
 author = "agent"
@@ -26,6 +30,17 @@ agentRequireRestartOnSave = false
 task = "shell.exec"
 args = "python main.py"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Seed Kanji Data"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python seed_data.py"
 
 [deployment]
 run = ["sh", "-c", "python main.py"]
