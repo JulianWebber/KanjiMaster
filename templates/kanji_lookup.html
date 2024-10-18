@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Kanji Lookup</h1>
+    <form method="POST" action="{{ url_for('kanji_lookup') }}">
+        <div class="mb-3">
+            <label for="search_type" class="form-label">Search by:</label>
+            <select class="form-select" id="search_type" name="search_type">
+                <option value="jlpt">JLPT Level</option>
+                <option value="radical">Radical</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="search_value" class="form-label">Search value:</label>
+            <input type="text" class="form-control" id="search_value" name="search_value" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if kanji_list %}
+    <h2 class="mt-4">Results:</h2>
+    <div class="row">
+        {% for kanji in kanji_list %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ kanji.character }}</h5>
+                    <p class="card-text"><strong>Meaning:</strong> {{ kanji.meaning }}</p>
+                    <p class="card-text"><strong>JLPT Level:</strong> N{{ kanji.jlpt_level }}</p>
+                    <p class="card-text"><strong>Radicals:</strong> {{ kanji.radicals }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

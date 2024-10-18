@@ -86,3 +86,23 @@ def update_preferences():
     user.preferred_learning_method = data.get('preferred_learning_method', user.preferred_learning_method)
     db.session.commit()
     return jsonify({'success': True})
+
+@app.route('/kanji_lookup', methods=['GET', 'POST'])
+def kanji_lookup():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        search_type = request.form.get('search_type')
+        search_value = request.form.get('search_value')
+        
+        if search_type == 'jlpt':
+            kanji_list = Kanji.query.filter_by(jlpt_level=search_value).all()
+        elif search_type == 'radical':
+            kanji_list = Kanji.query.filter(Kanji.radicals.contains(search_value)).all()
+        else:
+            kanji_list = []
+        
+        return render_template('kanji_lookup.html', kanji_list=kanji_list)
+    
+    return render_template('kanji_lookup.html', kanji_list=[])
