@@ -33,6 +33,16 @@ function updateFamiliarity(familiarity) {
     });
 }
 
+function pronounceKanji() {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(currentKanji.character);
+        utterance.lang = 'ja-JP';
+        speechSynthesis.speak(utterance);
+    } else {
+        alert('Sorry, your browser does not support text-to-speech!');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     loadNextKanji();
 
@@ -41,4 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('nextKanji').addEventListener('click', loadNextKanji);
+
+    document.getElementById('pronounce').addEventListener('click', pronounceKanji);
 });
