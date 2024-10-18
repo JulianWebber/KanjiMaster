@@ -2,7 +2,7 @@ from flask import render_template, request, jsonify, session, redirect, url_for
 from app import app, db
 from models import User, Kanji, UserProgress
 from utils import get_next_kanji, update_user_progress
-from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 @app.route('/')
 def index():
@@ -46,9 +46,9 @@ def register():
     data = request.json
     user = User(
         username=data['username'],
-        email=data['email'],
-        password_hash=generate_password_hash(data['password'])
+        email=data['email']
     )
+    user.set_password(data['password'])
     db.session.add(user)
     db.session.commit()
     session['user_id'] = user.id
@@ -58,8 +58,10 @@ def register():
 def login():
     data = request.json
     user = User.query.filter_by(username=data['username']).first()
-    if user and check_password_hash(user.password_hash, data['password']):
+    if user and user.check_password(data['password']):
         session['user_id'] = user.id
+        user.last_login = datetime.utcnow()
+        db.session.commit()
         return jsonify({'success': True})
     return jsonify({'error': 'Invalid credentials'}), 401
 
@@ -67,3 +69,20 @@ def login():
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('index'))
+
+@app.route('/user_profile')
+def user_profile():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    user = User.query.get(session['user_id'])
+    return render_template('user_profile.html', user=user)
+
+@app.route('/update_preferences', methods=['POST'])
+def update_preferences():
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 401
+    data = request.json
+    user = User.query.get(session['user_id'])
+    user.preferred_learning_method = data.get('preferred_learning_method', user.preferred_learning_method)
+    db.session.commit()
+    return jsonify({'success': True})

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">User Profile</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ user.username }}</h5>
+            <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+            <p class="card-text"><strong>Date Joined:</strong> {{ user.date_joined.strftime('%Y-%m-%d') }}</p>
+            <p class="card-text"><strong>Last Login:</strong> {{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p class="card-text"><strong>Total Kanji Learned:</strong> {{ user.total_kanji_learned }}</p>
+            <p class="card-text"><strong>Preferred Learning Method:</strong> {{ user.preferred_learning_method }}</p>
+        </div>
+    </div>
+    <div class="mt-4">
+        <h2>Update Preferences</h2>
+        <form id="update-preferences-form">
+            <div class="mb-3">
+                <label for="preferred_learning_method" class="form-label">Preferred Learning Method</label>
+                <select class="form-select" id="preferred_learning_method" name="preferred_learning_method">
+                    <option value="flashcards" {% if user.preferred_learning_method == 'flashcards' %}selected{% endif %}>Flashcards</option>
+                    <option value="quiz" {% if user.preferred_learning_method == 'quiz' %}selected{% endif %}>Quiz</option>
+                    <option value="practice" {% if user.preferred_learning_method == 'practice' %}selected{% endif %}>Practice</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Preferences</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('update-preferences-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    fetch('/update_preferences', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            preferred_learning_method: document.getElementById('preferred_learning_method').value,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Preferences updated successfully!');
+            location.reload();
+        } else {
+            alert('Failed to update preferences. Please try again.');
+        }
+    });
+});
+</script>
+{% endblock %}
