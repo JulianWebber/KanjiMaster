@@ -21,3 +21,7 @@ with app.app_context():
     import models
     import routes
     db.create_all()
+    db.session.commit()  # Add this line to commit the changes
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
