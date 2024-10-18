@@ -2,10 +2,17 @@ let currentKanji;
 let offlineKanji = [];
 
 function loadNextKanji() {
+    console.log('loadNextKanji function called');
     if (navigator.onLine) {
         fetch('/get_next_kanji')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Received data:', data);
                 currentKanji = data;
                 displayKanji(currentKanji);
                 // Store kanji for offline use
@@ -14,7 +21,8 @@ function loadNextKanji() {
                     localStorage.setItem('offlineKanji', JSON.stringify(offlineKanji));
                 }
             })
-            .catch(() => {
+            .catch(error => {
+                console.error('Error fetching next kanji:', error);
                 loadOfflineKanji();
             });
     } else {
@@ -23,6 +31,7 @@ function loadNextKanji() {
 }
 
 function loadOfflineKanji() {
+    console.log('Loading offline kanji');
     offlineKanji = JSON.parse(localStorage.getItem('offlineKanji')) || [];
     if (offlineKanji.length > 0) {
         currentKanji = offlineKanji[Math.floor(Math.random() * offlineKanji.length)];
@@ -34,6 +43,7 @@ function loadOfflineKanji() {
 }
 
 function displayKanji(kanji) {
+    console.log('Displaying kanji:', kanji);
     document.getElementById('kanji').textContent = kanji.character;
     document.getElementById('meaning').textContent = kanji.meaning;
     document.getElementById('onyomi').textContent = kanji.onyomi;
@@ -59,6 +69,9 @@ function updateFamiliarity(familiarity) {
             if (data.success) {
                 loadNextKanji();
             }
+        })
+        .catch(error => {
+            console.error('Error updating familiarity:', error);
         });
     } else {
         // Store progress locally when offline
@@ -102,13 +115,17 @@ function showFeedback(message, type) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded');
     loadNextKanji();
 
     document.getElementById('showInfo').addEventListener('click', function() {
         document.getElementById('info').style.display = 'block';
     });
 
-    document.getElementById('nextKanji').addEventListener('click', loadNextKanji);
+    document.getElementById('nextKanji').addEventListener('click', function() {
+        console.log('Next Kanji button clicked');
+        loadNextKanji();
+    });
 
     document.getElementById('pronounce').addEventListener('click', pronounceKanji);
 
@@ -122,6 +139,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(progress),
+            })
+            .catch(error => {
+                console.error('Error syncing offline progress:', error);
             });
         });
         localStorage.removeItem('offlineProgress');

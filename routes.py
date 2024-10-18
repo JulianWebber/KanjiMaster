@@ -30,16 +30,27 @@ def practice():
 def get_next_kanji_route():
     if 'user_id' not in session:
         return jsonify({'error': 'User not logged in'}), 401
-    kanji = get_next_kanji(session['user_id'])
-    return jsonify(kanji)
+    try:
+        kanji = get_next_kanji(session['user_id'])
+        if kanji:
+            return jsonify(kanji)
+        else:
+            return jsonify({'error': 'No kanji available'}), 404
+    except Exception as e:
+        app.logger.error(f"Error in get_next_kanji: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/update_progress', methods=['POST'])
 def update_progress():
     if 'user_id' not in session:
         return jsonify({'error': 'User not logged in'}), 401
     data = request.json
-    update_user_progress(session['user_id'], data['kanji_id'], data['familiarity'])
-    return jsonify({'success': True})
+    try:
+        update_user_progress(session['user_id'], data['kanji_id'], data['familiarity'])
+        return jsonify({'success': True})
+    except Exception as e:
+        app.logger.error(f"Error in update_progress: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/register', methods=['POST'])
 def register():
