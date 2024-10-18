@@ -25,7 +25,7 @@ class Kanji(db.Model):
     onyomi = db.Column(db.String(100))
     kunyomi = db.Column(db.String(100))
     example_sentence = db.Column(db.String(200))
-    jlpt_level = db.Column(db.Integer)
+    jlpt_level = db.Column(db.Integer)  # Added this line
     radicals = db.Column(db.String(100))
 
 class UserProgress(db.Model):

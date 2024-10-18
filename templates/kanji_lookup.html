@@ -3,6 +3,11 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Kanji Lookup</h1>
+    {% if 'user_id' not in session %}
+    <div class="alert alert-warning" role="alert">
+        Please <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">log in</a> or <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">register</a> to save your search history and progress.
+    </div>
+    {% endif %}
     <form method="POST" action="{{ url_for('kanji_lookup') }}">
         <div class="mb-3">
             <label for="search_type" class="form-label">Search by:</label>
@@ -13,7 +18,15 @@
         </div>
         <div class="mb-3">
             <label for="search_value" class="form-label">Search value:</label>
-            <input type="text" class="form-control" id="search_value" name="search_value" required>
+            <select class="form-select" id="search_value" name="search_value">
+                <option value="" selected disabled>Select a value</option>
+                {% for level in jlpt_levels %}
+                <option value="{{ level }}" class="jlpt-option">N{{ level }}</option>
+                {% endfor %}
+                {% for radical in radicals %}
+                <option value="{{ radical }}" class="radical-option" style="display: none;">{{ radical }}</option>
+                {% endfor %}
+            </select>
         </div>
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
@@ -36,4 +49,26 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchType = document.getElementById('search_type');
+    const searchValue = document.getElementById('search_value');
+    const jlptOptions = document.querySelectorAll('.jlpt-option');
+    const radicalOptions = document.querySelectorAll('.radical-option');
+
+    searchType.addEventListener('change', function() {
+        if (this.value === 'jlpt') {
+            jlptOptions.forEach(option => option.style.display = 'block');
+            radicalOptions.forEach(option => option.style.display = 'none');
+        } else {
+            jlptOptions.forEach(option => option.style.display = 'none');
+            radicalOptions.forEach(option => option.style.display = 'block');
+        }
+        searchValue.selectedIndex = 0;
+    });
+});
+</script>
 {% endblock %}

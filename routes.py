@@ -89,8 +89,8 @@ def update_preferences():
 
 @app.route('/kanji_lookup', methods=['GET', 'POST'])
 def kanji_lookup():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
+    jlpt_levels = [1, 2, 3, 4, 5]
+    radicals = ['水', '火', '木', '金', '土']  # Add more radicals as needed
     
     if request.method == 'POST':
         search_type = request.form.get('search_type')
@@ -103,6 +103,6 @@ def kanji_lookup():
         else:
             kanji_list = []
         
-        return render_template('kanji_lookup.html', kanji_list=kanji_list)
+        return render_template('kanji_lookup.html', kanji_list=kanji_list, jlpt_levels=jlpt_levels, radicals=radicals)
     
-    return render_template('kanji_lookup.html', kanji_list=[])
+    return render_template('kanji_lookup.html', kanji_list=[], jlpt_levels=jlpt_levels, radicals=radicals)
