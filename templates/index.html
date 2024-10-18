@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to Kanji Learning</h1>
+    <p class="lead">Improve your Japanese language skills with our interactive kanji learning app.</p>
+    <hr class="my-4">
+    <p>Start your journey by exploring flashcards, taking quizzes, or practicing kanji writing.</p>
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('flashcards') }}" role="button">Flashcards</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('quiz') }}" role="button">Quiz</a>
+        <a class="btn btn-info btn-lg" href="{{ url_for('practice') }}" role="button">Practice</a>
+    </div>
+</div>
+{% endblock %}

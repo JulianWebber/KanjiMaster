@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Kanji Flashcards</h1>
+<div id="flashcard" class="card">
+    <div class="card-body">
+        <h2 id="kanji" class="card-title text-center display-1"></h2>
+        <div id="info" class="mt-4" style="display: none;">
+            <p><strong>Meaning:</strong> <span id="meaning"></span></p>
+            <p><strong>Onyomi:</strong> <span id="onyomi"></span></p>
+            <p><strong>Kunyomi:</strong> <span id="kunyomi"></span></p>
+            <p><strong>Example:</strong> <span id="example"></span></p>
+        </div>
+    </div>
+</div>
+<div class="mt-4 text-center">
+    <button id="showInfo" class="btn btn-primary me-2">Show Info</button>
+    <button id="nextKanji" class="btn btn-secondary">Next Kanji</button>
+</div>
+<div class="mt-4">
+    <h3>How well do you know this kanji?</h3>
+    <div class="btn-group" role="group" aria-label="Familiarity">
+        <button type="button" class="btn btn-outline-danger" onclick="updateFamiliarity(0)">Not at all</button>
+        <button type="button" class="btn btn-outline-warning" onclick="updateFamiliarity(1)">Barely</button>
+        <button type="button" class="btn btn-outline-info" onclick="updateFamiliarity(2)">Somewhat</button>
+        <button type="button" class="btn btn-outline-primary" onclick="updateFamiliarity(3)">Well</button>
+        <button type="button" class="btn btn-outline-success" onclick="updateFamiliarity(4)">Very well</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/flashcards.js') }}"></script>
+{% endblock %}

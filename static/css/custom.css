@@ -1,0 +1,39 @@
+body {
+    padding-bottom: 20px;
+}
+
+.jumbotron {
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    background-color: var(--bs-dark);
+    border-radius: 0.3rem;
+}
+
+#flashcard {
+    min-height: 300px;
+}
+
+#kanji, #quiz-kanji, #practice-kanji {
+    font-size: 6rem;
+}
+
+#canvas {
+    background-color: #ffffff;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-group .btn {
+    flex: 1;
+    margin: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+}
