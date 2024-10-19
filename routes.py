@@ -33,8 +33,10 @@ def get_next_kanji_route():
     try:
         kanji = get_next_kanji(session['user_id'])
         if kanji:
+            app.logger.info(f"Returning kanji: {kanji}")
             return jsonify(kanji)
         else:
+            app.logger.warning("No kanji available")
             return jsonify({'error': 'No kanji available'}), 404
     except Exception as e:
         app.logger.error(f"Error in get_next_kanji: {str(e)}")

@@ -4,8 +4,10 @@ let offlineKanji = [];
 function loadNextKanji() {
     console.log('loadNextKanji function called');
     if (navigator.onLine) {
+        console.log('Online: Fetching next kanji');
         fetch('/get_next_kanji')
             .then(response => {
+                console.log('Fetch response received:', response);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -26,6 +28,7 @@ function loadNextKanji() {
                 loadOfflineKanji();
             });
     } else {
+        console.log('Offline: Loading offline kanji');
         loadOfflineKanji();
     }
 }
